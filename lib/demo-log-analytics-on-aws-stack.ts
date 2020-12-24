@@ -24,11 +24,11 @@ export class DemoLogAnalyticsOnAwsStack extends cdk.Stack {
 
     // Create a glue database and table to define the schema of output data
     const database = new glue.Database(this, 'AnalyticalLogsDatabase', {
-      databaseName: `${namespace}-analytical-logs`,
+      databaseName: `david_demo_analytical_logs`,
     })
     const table = new glue.Table(this, 'ParquetLogsTable', {
       database: database,
-      tableName: `${namespace}-parquet-logs`,
+      tableName: `parquetlogs`,
       columns: [
         {
           name: 'user_id',
@@ -39,30 +39,31 @@ export class DemoLogAnalyticsOnAwsStack extends cdk.Stack {
           type: glue.Schema.BIG_INT,
         },
         {
-          name: 'catagory',
+          name: 'category',
           type: glue.Schema.STRING,
         },
         {
           name: 'sampled_at',
-          type: glue.Schema.TIMESTAMP,
+          type: glue.Schema.STRING,
         },
       ],
       partitionKeys: [
         {
           name: 'year',
-          type: glue.Schema.INTEGER,
+          type: glue.Schema.STRING,
         },
         {
           name: 'month',
-          type: glue.Schema.SMALL_INT,
+          type: glue.Schema.STRING,
         },
         {
           name: 'day',
-          type: glue.Schema.SMALL_INT,
+          type: glue.Schema.STRING,
         },
       ],
       dataFormat: glue.DataFormat.PARQUET,
       bucket: analyticalBucket,
+      s3Prefix: 'data/',
     })
 
     // Kinesis Firehose access the Glue Database and Table in order to be deployed and parse incomming data
@@ -101,8 +102,13 @@ export class DemoLogAnalyticsOnAwsStack extends cdk.Stack {
       deliveryStreamType: 'DirectPut',
       extendedS3DestinationConfiguration: {
         bucketArn: analyticalBucket.bucketArn,
-        prefix: 'data/year=!{timestamp:yyyy}/month=!{timestamp:MM}/day=!{timestamp:dd}/',
-        errorOutputPrefix: 'errors/year=!{timestamp:yyyy}/!{firehose:error-output-type}/',
+        prefix: 'data\/year=!{timestamp:yyyy}\/month=!{timestamp:MM}\/day=!{timestamp:dd}\/',
+        errorOutputPrefix: 'errors\/year=!{timestamp:yyyy}\/!{firehose:error-output-type}\/',
+        roleArn: analyticalRole.roleArn,
+        bufferingHints: {
+          sizeInMBs: 64, // Buffering up to 64Mb (minimum is 64Mb)
+          intervalInSeconds: 60, // Buffering up to 60 seconds
+        },
         dataFormatConversionConfiguration: {
           enabled: true,
           inputFormatConfiguration: {
@@ -121,7 +127,6 @@ export class DemoLogAnalyticsOnAwsStack extends cdk.Stack {
             roleArn: analyticalRole.roleArn,
           },
         },
-        roleArn: analyticalRole.roleArn,
       },
     })
 
