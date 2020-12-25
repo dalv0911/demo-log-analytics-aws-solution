@@ -19,7 +19,7 @@ As you can see, we use 4 aws services
 ## Pricing
 One of the most importance when considering an architecture is the pricing. No matter how cool the technical is, if the cost is too expensive it mean nothing.
 
-Because of this solution is serverless, we can't calculate exactly the cost but let's me show you the estimate cost.
+Since, this is a serverless solution, we can't calculate exactly the cost but let's me show you the estimate cost.
 
 Let's suppose we have `1000 records of streaming data per second` sent to Firehose in `8 hours a day (28,800 seconds)`. Each record has `5KB in size`. Here is a simple cost simulator.
 
@@ -35,7 +35,7 @@ Let's suppose we have `1000 records of streaming data per second` sent to Fireho
   - Number of object stored = (8 hours/day * 60 minutes ÷ 6 minutes/object) * 30 days/month = `2,400 objects` -> It's free since it's not over the 1M object. yeah :)
   - Number of requests = number of object in this case. It's also free charge.
 - Amazon S3
-  - As we calculate storage per month above, we will store 4119.552 GB/month but this is the volume before compress. We store data in parquet format, which is compressed format. Suppose that parquet format will compess roughly 70% for origin volume, then the actually storage is 0.7 * 4119.552 = `2883.68 GB/month`.
+  - As we calculate storage per month above, we will store 4119.552 GB/month but this is the volume before compress. We store data in parquet format, which is compressed format. Suppose that parquet format will compess roughly 70% of origin volume, then the actually storage is 0.7 * 4119.552 = `2883.68 GB/month`.
   - Storage charges = 2883.68 GB/month * $0.025 = `$72`
 - Amazon Athena
   - We will be charged only when the queries scan data. By adding partitions and supporting columnar format (parquet), I guess the cost of query is not too much!
@@ -85,7 +85,7 @@ go run main.go
  * `cdk destroy`     destroy the infra you have been created
 
 ### Do you feel tired when removing the S3 Bucket if the CDK has failed?
-If CDK has failed, the CDK will take care of rollback process. Since, AWS S3 is object storage, it's dangerous to being deleted. So, CDK does't delete created buckets, and when we redeploy it, `the buckets alreadt exits` error will occur. To resolve this problem, we need to delete created S3 buckets manually.
+If CDK has failed, the CDK will take care of rollback process. Since, AWS S3 is object storage, it's dangerous to being deleted. So, CDK doesn't delete created buckets, and when we redeploy it, `the buckets alreadt exits` error will occur. To resolve this problem, we need to delete created S3 buckets manually.
 
 Don't worry, I have wrote a snippet to delete these buckets. However, please be careful when using this even it only delete empty bucket. :)
 ```bash
