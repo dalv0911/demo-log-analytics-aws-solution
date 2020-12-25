@@ -84,8 +84,8 @@ go run main.go
  * `cdk synth`       emits the synthesized CloudFormation template
  * `cdk destroy`     destroy the infra you have been created
 
-### Do you feel tired when removing the S3 Bucket if the CDK has failed 
-If CDK has failed, the CDK will take care of rollback process. Since, AWS S3 is object storage, so it's dangerous to being deleted. So, CDK does't delete created buckets, and when we redeploy it, `the buckets alreadt exits` error will occur. To resolve this problem, we need to delete created S3 buckets manually.
+### Do you feel tired when removing the S3 Bucket if the CDK has failed?
+If CDK has failed, the CDK will take care of rollback process. Since, AWS S3 is object storage, it's dangerous to being deleted. So, CDK does't delete created buckets, and when we redeploy it, `the buckets alreadt exits` error will occur. To resolve this problem, we need to delete created S3 buckets manually.
 
 Don't worry, I have wrote a snippet to delete these buckets. However, please be careful when using this even it only delete empty bucket. :)
 ```bash
